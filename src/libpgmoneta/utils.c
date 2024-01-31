@@ -308,6 +308,7 @@ pgmoneta_extract_message_from_data(char type, void* data, size_t data_size, stru
    while (result == NULL && offset < data_size)
    {
       char t = (char)pgmoneta_read_byte(data + offset);
+      pgmoneta_log_trace("pgmoneta_extract_message_from_data: %s", t);
 
       if (type == t)
       {
