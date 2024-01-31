@@ -1048,6 +1048,7 @@ pgmoneta_query_execute(int socket, struct message* msg, struct query_response** 
    status = pgmoneta_write_message(NULL, socket, msg);
    if (status != MESSAGE_STATUS_OK)
    {
+      pgmoneta_log_trace("ERROR: pgmoneta_write_message returned status: %d", status);
       goto error;
    }
 
@@ -1071,6 +1072,7 @@ pgmoneta_query_execute(int socket, struct message* msg, struct query_response** 
       }
       else
       {
+         pgmoneta_log_trace("ERROR: pgmoneta_read_block_message returned status: %d", status);
          goto error;
       }
 
@@ -1080,11 +1082,13 @@ pgmoneta_query_execute(int socket, struct message* msg, struct query_response** 
 
    if (pgmoneta_has_message('E', data, data_size))
    {
+      pgmoneta_log_trace("ERROR: pgmoneta_has_message 'E'");
       goto error;
    }
 
    if (pgmoneta_extract_message_from_data('T', data, data_size, &tmsg))
    {
+      pgmoneta_log_trace("ERROR: pgmoneta_extract_message_from_data 'T'");
       goto error;
    }
 
@@ -1099,6 +1103,7 @@ pgmoneta_query_execute(int socket, struct message* msg, struct query_response** 
    {
       if (get_column_name(tmsg, i, &name))
       {
+         pgmoneta_log_trace("ERROR: get_column_name: %s ", &name);
          goto error;
       }
 
@@ -1144,6 +1149,8 @@ pgmoneta_query_execute(int socket, struct message* msg, struct query_response** 
    return 0;
 
 error:
+
+   pgmoneta_log_trace("An error occurred in pgmoneta_query_execute(): %s", &msg);
 
    pgmoneta_disconnect(fd);
 
